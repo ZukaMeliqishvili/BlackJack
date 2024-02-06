@@ -12,6 +12,6 @@ namespace BlackJack.DbModels
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
         public DateTime DateOfBirth { get; set; }
-        public decimal? Balance { get; set; }
+        public decimal? Balance { get; set; } = 0;
     }
 }

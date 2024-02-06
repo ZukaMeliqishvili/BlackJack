@@ -193,7 +193,7 @@ namespace BlackJack
                 age--;
             }
 
-            return age>=18;
+            return age>=21;
         }
     }
 }
