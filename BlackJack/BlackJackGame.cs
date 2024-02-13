@@ -15,7 +15,6 @@ namespace BlackJack
 {
     public class BlackJackGame
     {
-        private TaskCompletionSource<string> playerDecisionTaskCompletionSource;
         static List<string> cards;
         static int counter = 0;
         private  Game gameForm;
