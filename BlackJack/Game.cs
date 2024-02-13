@@ -15,13 +15,14 @@ namespace BlackJack
 {
     public partial class Game : Form
     {
+        public event EventHandler HitClicked;
+        public event EventHandler StandClicked;
         private Deposit_Form depositForm;
         private readonly int userId;
         User user;
         BlackJackContext context;
         public Button HitButton { get; private set; }
         public Button StandButton { get; private set; }
-        private static TaskCompletionSource<string> playerDecisionTaskCompletionSource = new TaskCompletionSource<string>();
 
         public Game(int userId)
         {
@@ -35,39 +36,26 @@ namespace BlackJack
             
             HitButton = new Button();
             HitButton.Text = "Hit";
-            HitButton.Click += HitButton_Click;
+            HitButton.Click += (sender, e) => HitClicked?.Invoke(this, EventArgs.Empty);
             HitButton.Visible = false;
             HitButton.BackColor = Color.Green;
             HitButton.ForeColor = Color.Black;
             HitButton.Size = new Size(100, 40);
-            HitButton.Location = new Point(450, 200);
+            HitButton.Location = new Point(500, 300);
             Controls.Add(HitButton);
 
             
             StandButton = new Button();
             StandButton.Text = "Stand";
-            StandButton.Click += StandButton_Click;
+            StandButton.Click += (sender, e) => StandClicked?.Invoke(this, EventArgs.Empty);
             StandButton.Visible = false;
             StandButton.BackColor = Color.Red;
             StandButton.ForeColor = Color.Black;
             StandButton.Size = new Size(100, 40);
-            StandButton.Location = new Point(550, 200);
+            StandButton.Location = new Point(600, 300);
             Controls.Add(StandButton);
         }
 
-        private void HitButton_Click(object sender, EventArgs e)
-        {
-           
-            playerDecisionTaskCompletionSource?.SetResult("Hit");
-
-        }
-
-        private void StandButton_Click(object sender, EventArgs e)
-        {
-            
-            playerDecisionTaskCompletionSource?.SetResult("Stand");
-
-        }
         private void LogOutButton_Click(object sender, EventArgs e)
         {
             LoginForm form = new LoginForm();
@@ -83,8 +71,7 @@ namespace BlackJack
             UserNameLabel.Text = user.UserName;
             PlayerScoreLabel.Text = "";
             DealerScoreLabel.Text = "";
-            //PlayerLabel.Hide();
-            //DealerLabel.Hide();
+            WinLabel.Hide();
         }
 
         private void BalanceLabel_Click(object sender, EventArgs e)
@@ -107,32 +94,60 @@ namespace BlackJack
         }
         private void ReloadGameForm()
         {
+            Thread.Sleep(5000);
             user = context.Users.FirstOrDefault(u => u.Id == userId);
             context.Entry(user).Reload();
             BalanceLabel.Text = String.Format("{0:N2}", user.Balance);
             DepositButton.Show();
             PlayerScoreLabel.Text = "";
             DealerScoreLabel.Text = "";
-            PlayerLabel.Hide();
-            DealerLabel.Hide();
+            RemoveImages();
+            //WinLabel.Hide();
+            BetButton.Show();
         }
 
-        private void Panel_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        //private void BetButton_Click(object sender, EventArgs e)
-        //{
-        //    decimal bet = BetTextBox.Value;
-        //    DepositButton.Hide();
-        //    BlackJackGame.StartGame(bet, this);
-        //}
         private void BetButton_Click(object sender, EventArgs e)
         {
             decimal bet = BetTextBox.Value;
             DepositButton.Hide();
-            BlackJackGame.StartGame(bet, this);
+            BlackJackGame game = new BlackJackGame(this,userId,bet);
+            game.StartGame();
+
+            ReloadGameForm();
         }
+        private void RemoveImages()
+        {
+            List<PictureBox> pictureBoxesToRemove = new List<PictureBox>();
+
+            // Find PictureBox controls to remove
+            foreach (var control in Controls)
+            {
+                if (control is PictureBox pictureBox)
+                {
+                    pictureBoxesToRemove.Add(pictureBox);
+                }
+            }
+
+            foreach (var pictureBox in pictureBoxesToRemove)
+            {
+                Controls.Remove(pictureBox);
+                pictureBox.Dispose();
+            }
+        }
+
+        //public void ShowWinner(string winner, decimal amount)
+        //{
+        //    if (winner == "Player")
+        //    {
+        //        WinLabel.ForeColor = Color.Green;
+        //        WinLabel.Text = $"Player wins {amount}";
+        //    }
+        //    else if (winner == "Dealer")
+        //    {
+        //        WinLabel.ForeColor = Color.Red;
+        //        WinLabel.Text = $"Dealer wins {amount}";
+        //    }
+           
+        //}
     }
 }

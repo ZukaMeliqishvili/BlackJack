@@ -1,31 +1,50 @@
-﻿using System;
+﻿using BlackJack.DbModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Windows.ApplicationModel.VoiceCommands;
+using Windows.Devices.HumanInterfaceDevice;
 using Windows.UI.Input.Inking.Analysis;
 
 namespace BlackJack
 {
-    static class BlackJackGame
+    public class BlackJackGame
     {
-        private static TaskCompletionSource<string> playerDecisionTaskCompletionSource;
+        private TaskCompletionSource<string> playerDecisionTaskCompletionSource;
         static List<string> cards;
         static int counter = 0;
-        private static Game gameForm;
-        private static bool shuffle;
-        private static int playerScore = 0;
-        private static int dealerScore = 0;
-        private static Random r = new Random();
+        private  Game gameForm;
+        private int playerScore = 0;
+        private int dealerScore = 0;
+        private Random r = new Random();
+        private bool playerDecisionMade = false;
+        private string playerDecision = "";
+        private int playerCardCount = 0;
+        private int dealerCardCount = 0;
+        private string winner = "Tie";
+        private BlackJackContext context;
+        private decimal bet;
+        private bool playerWinsWithBlackJack = false;
+        private int userId;
         static BlackJackGame()
         {
             cards = new List<string>();
             InitializeCards();
         }
-        public static void InitializeCards()
+        public BlackJackGame(Game form, int userId, decimal bet)
+        {
+            this.bet = bet;
+            gameForm = form;
+            this.userId = userId;
+            InitializeButtons();
+            context=new BlackJackContext();
+        }
+        private static void InitializeCards()
         {
             cards.Clear();
             string[] suite = new string[4] { "h", "c", "d", "s" };
@@ -42,49 +61,90 @@ namespace BlackJack
                     }
                 }
             }
-            //cards.Add("cut");
-            //cards.Insert(155, "cut");
             counter = 0;
         }
-        public static void StartGame(decimal bet, Game form)
+        private void InitializeButtons()
         {
-            gameForm = form;
-            DealCards();
-            StartGamingProcess().GetAwaiter();
-        }
-        //private static void StartGamingProcess()
-        //{
-        //    while(playerScore<21)
-        //    {
-        //        //ask player for decision
-        //    }
+            gameForm.HitClicked += (sender, e) =>
+            {
+                playerDecision = "Hit";
+                playerDecisionMade = true;
+            };
 
-        //}
-        public static async Task StartGamingProcess()
+            gameForm.StandClicked += (sender, e) =>
+            {
+                playerDecision = "Stand";
+                playerDecisionMade = true;
+            };
+        }
+        public void StartGame()
+        {
+            gameForm.BetButton.Hide();
+            gameForm.WinLabel.Hide();
+            decimal amount = decimal.Parse(gameForm.BalanceLabel.Text);
+            gameForm.BalanceLabel.Text = (amount - bet).ToString();
+            DealCards();
+            StartGamingProcess();
+            Pay();
+            if (counter >= 180)
+            {
+                InitializeCards();
+            }
+        }
+
+        public void StartGamingProcess()
         {
             while (playerScore < 21)
             {
                 gameForm.HitButton.Visible = true;
                 gameForm.StandButton.Visible = true;
-                string decision = await WaitForPlayerDecision();
-                if (decision == "Hit")
+
+                while (!playerDecisionMade)
+                {
+                    Application.DoEvents();
+                }
+                playerDecisionMade = false;
+                if (playerDecision == "Hit")
                 {
                     int index = r.Next(0, 312 - counter);
                     string card = cards[index];
+                    gameForm.HitButton.Visible = false;
+                    gameForm.StandButton.Visible = false;
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
                     SendPlayerScore(card);
                     cards.RemoveAt(index);
+                    playerCardCount++;
+                    sendPlayersCard(card);
                     counter++;
+                    
+                    Thread.Sleep(TimeSpan.FromSeconds(0.5));
                 }
-                else if (decision == "Stand")
+                else if (playerDecision == "Stand")
                 {
                     break;
                 }
+                
+                gameForm.HitButton.Visible = false;
+                gameForm.StandButton.Visible = false;
+            }
+            if (gameForm.PlayerScoreLabel.Text == "BJ" && (dealerScore != 10 || dealerScore != 11))
+            {
+                winner = "Player";
+                playerWinsWithBlackJack = true;
+                return;
+            }
+            if(playerScore>21)
+            {
+                winner = "Dealer";
+                return;
             }
             gameForm.HitButton.Visible = false;
             gameForm.StandButton.Visible = false;
             scanDealerCards();
+            DetermineWinner();
+
         }
-        private static void scanDealerCards()
+        private void scanDealerCards()
         {
             while(dealerScore<17)
             {
@@ -93,48 +153,137 @@ namespace BlackJack
                 SendDealerScore(card);
                 cards.RemoveAt(index);
                 counter++;
+                dealerCardCount++;
+                sendDealersCard(card);
             }
         }
-        private static async Task<string> WaitForPlayerDecision()
+        private void DetermineWinner()
         {
-            var tcs = new TaskCompletionSource<string>();
-            playerDecisionTaskCompletionSource = new TaskCompletionSource<string>(); 
-            gameForm.HitButton.Click += (sender, e) =>
+            bool dealerHasBJ = gameForm.DealerScoreLabel.Text == "BJ";
+            bool playerHasBJ=  gameForm.PlayerScoreLabel.Text == "BJ";
+            if(playerHasBJ && !dealerHasBJ)
             {
-                playerDecisionTaskCompletionSource.SetResult("Hit");
-            };
-
-            gameForm.StandButton.Click += (sender, e) =>
+                winner = "Player";
+                playerWinsWithBlackJack= true;
+                return;
+            }
+            if(dealerHasBJ && !playerHasBJ)
             {
-                playerDecisionTaskCompletionSource.SetResult("Stand");
-            };
-
-            return await playerDecisionTaskCompletionSource.Task;
+                winner = "Dealer";
+                return;
+            }
+            if(dealerScore>21)
+            {
+                winner = "Player";
+                return;
+            }
+            if(playerScore>dealerScore)
+            {
+                winner = "Player";
+            }
+            else if(dealerScore>playerScore)
+            {
+                winner = "Dealer";
+            }
         }
-        private static void DealCards()
+        private void Pay()
+        {
+            decimal payout = bet;
+            var user = context.Users.SingleOrDefault(x=>x.Id==userId);
+            if(winner=="Player")
+            {
+                if (playerWinsWithBlackJack)
+                {
+                    payout = payout*(decimal)1.5;
+                }
+                user.Balance += payout;
+                gameForm.WinLabel.ForeColor = Color.Green;
+                decimal winamount = payout + bet;
+                gameForm.WinLabel.Text = $"Player wins {winamount}";
+                //gameForm.ShowWinner("Player", payout + bet);
+                gameForm.WinLabel.Show();
+                context.SaveChanges();
+                return;
+
+            }
+            if(winner=="Dealer")
+            {
+                payout *= -1;
+                user.Balance += payout;
+                gameForm.WinLabel.ForeColor = Color.Red;
+                gameForm.WinLabel.Text = $"Dealer wins {bet}";
+                //gameForm.ShowWinner("Dealer", bet);
+                gameForm.WinLabel.Show();
+                context.SaveChanges();
+            }
+            else
+            {
+                gameForm.WinLabel.ForeColor = Color.Green;
+                gameForm.WinLabel.Text = $"Player wins {bet}";
+                gameForm.WinLabel.Show();
+            }
+        }
+        private void DealCards()
         {
             int index = r.Next(0, 312 - counter);
             string card = cards[index];
+            playerCardCount++;
             SendPlayerScore(card);
             cards.RemoveAt(index);
+            sendPlayersCard(card);
             counter++;
             card = cards[r.Next(0, 312 - counter)];
+            dealerCardCount++;
             SendDealerScore(card);
             cards.RemoveAt(index);
+            sendDealersCard(card);
             counter++;
             card = cards[r.Next(0, 312 - counter)];
+            playerCardCount++;
             SendPlayerScore(card);
             cards.RemoveAt(index);
+            sendPlayersCard(card);
             counter++;
         }
-        private static void SendPlayerScore(string card)
+        private void sendPlayersCard(string card)
+        {
+            PictureBox pictureBox = new PictureBox();
+
+            pictureBox.Location = new Point(400+(60*playerCardCount), 400);
+            pictureBox.Size = new Size(60, 120);
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
+            string imagePath = Path.Combine(projectDirectory, "Resources", "Cards", $"{card}.jpg");
+
+            if (File.Exists(imagePath))
+            {
+
+                pictureBox.Image = Image.FromFile(imagePath);
+                pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                gameForm.Controls.Add(pictureBox);
+            }
+        }
+        private void sendDealersCard(string card)
+        {
+            PictureBox pictureBox = new PictureBox();
+
+            pictureBox.Location = new Point(400 + (60 * dealerCardCount), 80);
+            pictureBox.Size = new Size(60, 120);
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
+            string imagePath = Path.Combine(projectDirectory, "Resources", "Cards", $"{card}.jpg");
+
+            if (File.Exists(imagePath))
+            {
+
+                pictureBox.Image = Image.FromFile(imagePath);
+                pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                gameForm.Controls.Add(pictureBox);
+            }
+        }
+        private void SendPlayerScore(string card)
         {
             Thread.Sleep(TimeSpan.FromSeconds(1));
-            if(card == "cut")
-            {
-                shuffle = true;
-                return;
-            }
             char c = card[0];
             if (c == 't' || c == 'j' || c == 'q' || c == 'k')
             {
@@ -155,25 +304,22 @@ namespace BlackJack
             {
                 playerScore += int.Parse(c.ToString());
             }
-            if(playerScore == 21)
+            if(playerScore == 21 && playerCardCount ==2)
             {
-                gameForm.PlayerScoreLabel.Text = "BJ";
+                //gameForm.PlayerScoreLabel.Text = "BJ";
+                gameForm.Invoke(()=>gameForm.PlayerScoreLabel.Text = "BJ");
             }
             else
             {
-                gameForm.PlayerScoreLabel.Text = playerScore.ToString();
+                //gameForm.PlayerScoreLabel.Text = playerScore.ToString();
+                gameForm.Invoke(() => gameForm.PlayerScoreLabel.Text = playerScore.ToString());
             }
-            
             gameForm.Refresh();
+
         }
-        private static void SendDealerScore(string card)
+        private void SendDealerScore(string card)
         {
             Thread.Sleep(TimeSpan.FromSeconds(1));
-            if (card == "cut")
-            {
-                shuffle = true;
-                return;
-            }
             char c = card[0];
             if (c == 't' || c == 'j' || c == 'q' || c == 'k')
             {
@@ -196,11 +342,13 @@ namespace BlackJack
             }
             if(dealerScore == 21)
             {
-                gameForm.DealerScoreLabel.Text = "BJ";
+                //gameForm.DealerScoreLabel.Text = "BJ";
+                gameForm.Invoke(() => gameForm.DealerScoreLabel.Text = "BJ");
             }
             else
             {
-                gameForm.DealerScoreLabel.Text = dealerScore.ToString();
+                //gameForm.DealerScoreLabel.Text = dealerScore.ToString();
+                gameForm.Invoke(() => gameForm.DealerScoreLabel.Text = dealerScore.ToString());
             }
             
             gameForm.Refresh();
