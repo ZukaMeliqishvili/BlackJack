@@ -16,6 +16,7 @@ namespace BlackJack.DbModels
         {
         }
 
+        public virtual DbSet<GameHistory> GameHistories { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -29,6 +30,33 @@ namespace BlackJack.DbModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<GameHistory>(entity =>
+            {
+                entity.ToTable("GameHistory");
+
+                entity.Property(e => e.Bet).HasColumnType("money");
+
+                entity.Property(e => e.DealerScore)
+                    .HasMaxLength(2)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.Payout).HasColumnType("money");
+
+                entity.Property(e => e.PlayerScore)
+                    .HasMaxLength(2)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.UserId).HasColumnName("userId");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.GameHistories)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__GameHisto__userI__49C3F6B7");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.Email, "UQ__Users__A9D105342FCF74C4")

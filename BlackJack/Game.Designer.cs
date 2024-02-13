@@ -40,6 +40,7 @@
             DealerScoreLabel = new Label();
             PlayerScoreLabel = new Label();
             WinLabel = new Label();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)BetTextBox).BeginInit();
             SuspendLayout();
             // 
@@ -104,12 +105,14 @@
             // 
             // BetButton
             // 
+            BetButton.BackColor = SystemColors.ActiveCaption;
+            BetButton.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
             BetButton.Location = new Point(548, 637);
             BetButton.Name = "BetButton";
             BetButton.Size = new Size(150, 35);
             BetButton.TabIndex = 6;
             BetButton.Text = "Make Bet";
-            BetButton.UseVisualStyleBackColor = true;
+            BetButton.UseVisualStyleBackColor = false;
             BetButton.Click += BetButton_Click;
             // 
             // BetTextBox
@@ -175,11 +178,24 @@
             WinLabel.TabIndex = 12;
             WinLabel.Text = "label2";
             // 
+            // button1
+            // 
+            button1.BackColor = Color.Yellow;
+            button1.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
+            button1.Location = new Point(1157, 36);
+            button1.Name = "button1";
+            button1.Size = new Size(136, 44);
+            button1.TabIndex = 13;
+            button1.Text = "Game History";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
+            // 
             // Game
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1377, 684);
+            Controls.Add(button1);
             Controls.Add(WinLabel);
             Controls.Add(PlayerScoreLabel);
             Controls.Add(DealerScoreLabel);
@@ -213,5 +229,6 @@
         public Label DealerScoreLabel;
         public Label PlayerScoreLabel;
         public Label WinLabel;
+        private Button button1;
     }
 }

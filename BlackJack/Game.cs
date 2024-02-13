@@ -33,7 +33,7 @@ namespace BlackJack
         }
         private void InitializeButtons()
         {
-            
+
             HitButton = new Button();
             HitButton.Text = "Hit";
             HitButton.Click += (sender, e) => HitClicked?.Invoke(this, EventArgs.Empty);
@@ -44,7 +44,7 @@ namespace BlackJack
             HitButton.Location = new Point(500, 300);
             Controls.Add(HitButton);
 
-            
+
             StandButton = new Button();
             StandButton.Text = "Stand";
             StandButton.Click += (sender, e) => StandClicked?.Invoke(this, EventArgs.Empty);
@@ -94,14 +94,14 @@ namespace BlackJack
         }
         private void ReloadGameForm()
         {
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
             user = context.Users.FirstOrDefault(u => u.Id == userId);
             context.Entry(user).Reload();
             BalanceLabel.Text = String.Format("{0:N2}", user.Balance);
             DepositButton.Show();
-            PlayerScoreLabel.Text = "";
-            DealerScoreLabel.Text = "";
-            RemoveImages();
+            //PlayerScoreLabel.Text = "";
+            //DealerScoreLabel.Text = "";
+            //RemoveImages();
             //WinLabel.Hide();
             BetButton.Show();
         }
@@ -110,12 +110,12 @@ namespace BlackJack
         {
             decimal bet = BetTextBox.Value;
             DepositButton.Hide();
-            BlackJackGame game = new BlackJackGame(this,userId,bet);
+            BlackJackGame game = new BlackJackGame(this, userId, bet);
             game.StartGame();
 
             ReloadGameForm();
         }
-        private void RemoveImages()
+        public void RemoveImages()
         {
             List<PictureBox> pictureBoxesToRemove = new List<PictureBox>();
 
@@ -135,6 +135,12 @@ namespace BlackJack
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            GameHistoryForm form = new GameHistoryForm(userId);
+            form.Show();
+        }
+
         //public void ShowWinner(string winner, decimal amount)
         //{
         //    if (winner == "Player")
@@ -147,7 +153,7 @@ namespace BlackJack
         //        WinLabel.ForeColor = Color.Red;
         //        WinLabel.Text = $"Dealer wins {amount}";
         //    }
-           
+
         //}
     }
 }

@@ -28,6 +28,10 @@ namespace BlackJack
         private int dealerCardCount = 0;
         private string winner = "Tie";
         private BlackJackContext context;
+        private bool playerHasAce = false;
+        private bool dealerHasAce = false;
+        private bool playerScoresDeducted = false;
+        private bool dealerScoresDeducted = false;
         private decimal bet;
         private bool playerWinsWithBlackJack = false;
         private int userId;
@@ -82,6 +86,9 @@ namespace BlackJack
             gameForm.BetButton.Hide();
             gameForm.WinLabel.Hide();
             decimal amount = decimal.Parse(gameForm.BalanceLabel.Text);
+            gameForm.RemoveImages();
+            gameForm.PlayerScoreLabel.Text = "";
+            gameForm.DealerScoreLabel.Text = "";
             gameForm.BalanceLabel.Text = (amount - bet).ToString();
             DealCards();
             StartGamingProcess();
@@ -111,9 +118,9 @@ namespace BlackJack
                     gameForm.HitButton.Visible = false;
                     gameForm.StandButton.Visible = false;
                     Thread.Sleep(TimeSpan.FromSeconds(1));
+                    ++playerCardCount;
                     SendPlayerScore(card);
                     cards.RemoveAt(index);
-                    playerCardCount++;
                     sendPlayersCard(card);
                     counter++;
                     
@@ -127,12 +134,7 @@ namespace BlackJack
                 gameForm.HitButton.Visible = false;
                 gameForm.StandButton.Visible = false;
             }
-            if (gameForm.PlayerScoreLabel.Text == "BJ" && (dealerScore != 10 || dealerScore != 11))
-            {
-                winner = "Player";
-                playerWinsWithBlackJack = true;
-                return;
-            }
+            
             if(playerScore>21)
             {
                 winner = "Dealer";
@@ -148,12 +150,18 @@ namespace BlackJack
         {
             while(dealerScore<17)
             {
+                if (gameForm.PlayerScoreLabel.Text == "BJ" && (dealerScore != 10 && dealerScore != 11))
+                {
+                    winner = "Player";
+                    playerWinsWithBlackJack = true;
+                    break;
+                }
                 int index = r.Next(0, 312 - counter);
                 string card = cards[index];
+                ++dealerCardCount;
                 SendDealerScore(card);
                 cards.RemoveAt(index);
                 counter++;
-                dealerCardCount++;
                 sendDealersCard(card);
             }
         }
@@ -203,10 +211,9 @@ namespace BlackJack
                 //gameForm.ShowWinner("Player", payout + bet);
                 gameForm.WinLabel.Show();
                 context.SaveChanges();
-                return;
 
             }
-            if(winner=="Dealer")
+            else if(winner=="Dealer")
             {
                 payout *= -1;
                 user.Balance += payout;
@@ -214,6 +221,7 @@ namespace BlackJack
                 gameForm.WinLabel.Text = $"Dealer wins {bet}";
                 //gameForm.ShowWinner("Dealer", bet);
                 gameForm.WinLabel.Show();
+                payout = 0;
                 context.SaveChanges();
             }
             else
@@ -222,24 +230,39 @@ namespace BlackJack
                 gameForm.WinLabel.Text = $"Player wins {bet}";
                 gameForm.WinLabel.Show();
             }
+            GameHistory gameHistory = new GameHistory()
+            {
+                PlayerScore = gameForm.PlayerScoreLabel.Text,
+                DealerScore = gameForm.DealerScoreLabel.Text,
+                Bet = bet,
+                Payout = payout,
+                UserId = userId
+            };
+            Task.Run(()=>CreateRoundHistory(gameHistory));
+            //CreateRoundHistory(gameHistory);
+        }
+        private void CreateRoundHistory(GameHistory gameHistory)
+        {
+            context.GameHistories.Add(gameHistory);
+            context.SaveChanges();
         }
         private void DealCards()
         {
             int index = r.Next(0, 312 - counter);
             string card = cards[index];
-            playerCardCount++;
+            ++playerCardCount;
             SendPlayerScore(card);
             cards.RemoveAt(index);
             sendPlayersCard(card);
             counter++;
             card = cards[r.Next(0, 312 - counter)];
-            dealerCardCount++;
+            ++dealerCardCount;
             SendDealerScore(card);
             cards.RemoveAt(index);
             sendDealersCard(card);
             counter++;
             card = cards[r.Next(0, 312 - counter)];
-            playerCardCount++;
+            ++playerCardCount;
             SendPlayerScore(card);
             cards.RemoveAt(index);
             sendPlayersCard(card);
@@ -291,20 +314,19 @@ namespace BlackJack
             }
             else if (c == 'a')
             {
-                if(playerScore > 10)
-                {
-                    playerScore += 1;
-                }
-                else
-                {
-                    playerScore += 11;
-                }
+                playerHasAce = true;
+                playerScore += 11;
             }
             else
             {
                 playerScore += int.Parse(c.ToString());
             }
-            if(playerScore == 21 && playerCardCount ==2)
+            if (playerScore > 21 && playerHasAce && !playerScoresDeducted)
+            {
+                playerScore -= 10;
+                playerScoresDeducted = true;
+            }
+            if (playerScore == 21 && playerCardCount ==2)
             {
                 //gameForm.PlayerScoreLabel.Text = "BJ";
                 gameForm.Invoke(()=>gameForm.PlayerScoreLabel.Text = "BJ");
@@ -327,20 +349,19 @@ namespace BlackJack
             }
             else if (c == 'a')
             {
-                if (dealerScore > 10)
-                {
-                    dealerScore += 1;
-                }
-                else
-                {
-                    dealerScore += 11;
-                }
+                dealerHasAce = true;
+                dealerScore += 11;
             }
             else
             {
                 dealerScore += int.Parse(c.ToString());
             }
-            if(dealerScore == 21)
+            if (dealerScore > 21 && dealerHasAce && !dealerScoresDeducted)
+            {
+                dealerScore -= 10;
+                dealerScoresDeducted=true;
+            }
+            if (dealerScore == 21 && dealerCardCount==2)
             {
                 //gameForm.DealerScoreLabel.Text = "BJ";
                 gameForm.Invoke(() => gameForm.DealerScoreLabel.Text = "BJ");
