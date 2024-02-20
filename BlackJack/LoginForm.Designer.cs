@@ -86,7 +86,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(106, 276);
+            label4.Location = new Point(195, 289);
             label4.Name = "label4";
             label4.Size = new Size(250, 20);
             label4.TabIndex = 5;
@@ -106,7 +106,7 @@
             // RegistrationButton
             // 
             RegistrationButton.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
-            RegistrationButton.Location = new Point(114, 317);
+            RegistrationButton.Location = new Point(204, 312);
             RegistrationButton.Name = "RegistrationButton";
             RegistrationButton.Size = new Size(216, 34);
             RegistrationButton.TabIndex = 7;

@@ -110,6 +110,12 @@ namespace BlackJack
         {
             decimal bet = BetTextBox.Value;
             DepositButton.Hide();
+            if (bet > decimal.Parse(BalanceLabel.Text))
+            {
+                MessageBox.Show("You dont have enough funds");
+                DepositButton.Show();
+                return;
+            }
             BlackJackGame game = new BlackJackGame(this, userId, bet);
             game.StartGame();
 

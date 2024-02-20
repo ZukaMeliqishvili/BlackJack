@@ -105,7 +105,7 @@
             // 
             // BetButton
             // 
-            BetButton.BackColor = SystemColors.ActiveCaption;
+            BetButton.BackColor = Color.Green;
             BetButton.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
             BetButton.Location = new Point(548, 637);
             BetButton.Name = "BetButton";
@@ -194,6 +194,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.LightSteelBlue;
             ClientSize = new Size(1377, 684);
             Controls.Add(button1);
             Controls.Add(WinLabel);

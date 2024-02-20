@@ -42,7 +42,6 @@ namespace BlackJack
                 MessageBox.Show("Incorrect user credentials");
                 return;
             }
-            MessageBox.Show("You have successfully loged in");
 
             Game form = new Game(user.Id);
             form.Closed += (s, args) => this.Close();
