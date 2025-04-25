@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BlackJack.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,8 +34,8 @@ namespace BlackJack.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PlayerScore = table.Column<string>(type: "char(2)", unicode: false, fixedLength: true, maxLength: 2, nullable: false),
-                    DealerScore = table.Column<string>(type: "char(2)", unicode: false, fixedLength: true, maxLength: 2, nullable: false),
+                    PlayerScore = table.Column<string>(type: "varchar(5)", unicode: false, maxLength: 5, nullable: false),
+                    DealerScore = table.Column<string>(type: "varchar(5)", unicode: false, maxLength: 5, nullable: false),
                     Bet = table.Column<decimal>(type: "money", nullable: false),
                     Payout = table.Column<decimal>(type: "money", nullable: false),
                     userId = table.Column<int>(type: "int", nullable: false)

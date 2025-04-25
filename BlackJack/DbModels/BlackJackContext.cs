@@ -37,16 +37,16 @@ namespace BlackJack.DbModels
                 entity.Property(e => e.Bet).HasColumnType("money");
 
                 entity.Property(e => e.DealerScore)
-                    .HasMaxLength(2)
+                    .HasMaxLength(5)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength(false);
 
                 entity.Property(e => e.Payout).HasColumnType("money");
 
                 entity.Property(e => e.PlayerScore)
-                    .HasMaxLength(2)
+                    .HasMaxLength(5)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength(false);
 
                 entity.Property(e => e.UserId).HasColumnName("userId");
 

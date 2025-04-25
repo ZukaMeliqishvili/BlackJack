@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlackJack.Migrations
 {
     [DbContext(typeof(BlackJackContext))]
-    [Migration("20250424130033_Init")]
-    partial class Init
+    [Migration("20250425073929_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,20 +37,20 @@ namespace BlackJack.Migrations
 
                     b.Property<string>("DealerScore")
                         .IsRequired()
-                        .HasMaxLength(2)
+                        .HasMaxLength(5)
                         .IsUnicode(false)
-                        .HasColumnType("char(2)")
-                        .IsFixedLength();
+                        .HasColumnType("varchar(5)")
+                        .IsFixedLength(false);
 
                     b.Property<decimal>("Payout")
                         .HasColumnType("money");
 
                     b.Property<string>("PlayerScore")
                         .IsRequired()
-                        .HasMaxLength(2)
+                        .HasMaxLength(5)
                         .IsUnicode(false)
-                        .HasColumnType("char(2)")
-                        .IsFixedLength();
+                        .HasColumnType("varchar(5)")
+                        .IsFixedLength(false);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
