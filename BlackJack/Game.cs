@@ -156,11 +156,10 @@ namespace BlackJack
         DepositButton.Show();
         return;
       }
-
+      
       BetLabel.Text = bet.ToString();
-      BlackJackGame game = new BlackJackGame(this, userId, bet);
+      BlackJackGame game = new BlackJackGame(this, userId, bet,user.Balance.GetValueOrDefault());
       game.StartGame();
-
       ReloadGameForm();
     }
 

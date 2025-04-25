@@ -38,6 +38,7 @@ namespace BlackJack
     private bool RequestInsurance = false;
     private bool IsInsured = false;
     public decimal insuranceBet = 0;
+    private decimal UserBalance = 0;
 
     static BlackJackGame()
     {
@@ -45,13 +46,15 @@ namespace BlackJack
       InitializeCards();
     }
 
-    public BlackJackGame(Game form, int userId, decimal bet)
+    public BlackJackGame(Game form, int userId, decimal bet, decimal userBalance)
     {
       this.bet = bet;
       gameForm = form;
       this.userId = userId;
+      UserBalance = userBalance;
       InitializeButtons();
       context = new BlackJackContext();
+      MakeTransfer(-bet);
     }
 
     private static void InitializeCards()
@@ -192,8 +195,10 @@ namespace BlackJack
         }
         else if (playerDecision == "Double")
         {
+          MakeTransfer(-bet);
           bet *= 2;
           gameForm.BetLabel.Text = bet.ToString();
+          gameForm.BalanceLabel.Text = UserBalance.ToString();
           DecisionMade("Double");
           Thread.Sleep(TimeSpan.FromSeconds(0.5));
           break;
@@ -218,7 +223,6 @@ namespace BlackJack
       gameForm.StandButton.Visible = false;
       scanDealerCards();
       DetermineWinner();
-
     }
 
     private void scanDealerCards()
@@ -257,7 +261,6 @@ namespace BlackJack
       {
         if (IsInsured)
         {
-          bet += insuranceBet;
           return;
         }
         winner = "Dealer";
@@ -298,45 +301,51 @@ namespace BlackJack
       if (IsInsured)
       {
         insuranceBet = bet / 2;
+        MakeTransfer(-insuranceBet);
         gameForm.BetLabel.Text = (bet+insuranceBet).ToString();
       }
+    }
+    private void MakeTransfer(decimal amount)
+    {
+      var user = context.Users.SingleOrDefault(x => x.Id == userId);
+      UserBalance += amount;
+      user.Balance = UserBalance;
+      context.SaveChanges();
     }
     private void Pay()
     {
       decimal payout = bet;
-      var user = context.Users.SingleOrDefault(x => x.Id == userId);
       if (winner == "Player")
       {
         if (playerWinsWithBlackJack)
         {
           payout = payout * (decimal)1.5;
         }
-
-        user.Balance += payout;
+        MakeTransfer(payout+bet);
         gameForm.WinLabel.ForeColor = Color.Green;
         decimal winamount = payout + bet;
         gameForm.WinLabel.Text = $"Player wins {winamount}";
         //gameForm.ShowWinner("Player", payout + bet);
         gameForm.WinLabel.Show();
-        context.SaveChanges();
+
       }
       else if (winner == "Dealer")
       {
         bet += insuranceBet;
-        payout = bet;
-        payout *= -1;
-        user.Balance += payout;
         gameForm.WinLabel.ForeColor = Color.Red;
         gameForm.WinLabel.Text = $"Dealer wins {bet}";
         //gameForm.ShowWinner("Dealer", bet);
         gameForm.WinLabel.Show();
-        payout = 0;
-        context.SaveChanges();
       }
       else
       {
+        if (IsInsured && gameForm.DealerScoreLabel.Text == "BJ")
+        {
+          MakeTransfer(bet+insuranceBet);
+        }
         gameForm.WinLabel.ForeColor = Color.Green;
         gameForm.WinLabel.Text = $"Player wins {bet}";
+        MakeTransfer(bet);
         gameForm.WinLabel.Show();
       }
 
