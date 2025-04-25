@@ -196,6 +196,11 @@ namespace BlackJack
         else if (playerDecision == "Double")
         {
           MakeTransfer(-bet);
+          if (UserBalance - bet < 0)
+          {
+            MessageBox.Show("Not enogh funds");
+            continue;
+          }
           bet *= 2;
           gameForm.BetLabel.Text = bet.ToString();
           gameForm.BalanceLabel.Text = UserBalance.ToString();
@@ -246,6 +251,47 @@ namespace BlackJack
       }
     }
 
+    private void checkForBonus(Card[] cards)
+    {
+      BlackJackBonusType bonus = DetermineBonusCombination(cards);
+    }
+
+    private BlackJackBonusType DetermineBonusCombination(Card [] cards)
+    {
+      bool isThreeOfAKind = cards.IsMatchedByCardId();
+      bool isFlush = cards.IsMatchedByCardSuite();
+      bool isStraight = cards.IsStraight();
+      //card example "ad" first char stands for A second char stands for Diamonds
+      if (isThreeOfAKind && isFlush)
+      {
+        return BlackJackBonusType.Suited_Trips;
+      }
+
+      if (isStraight && isFlush)
+      {
+        return BlackJackBonusType.Straight_Flush;
+      }
+
+      if (isThreeOfAKind)
+      {
+        return BlackJackBonusType.Three_of_a_kind;
+      }
+
+      if (isStraight)
+      {
+        return BlackJackBonusType.Straight;
+      }
+
+      if (isFlush)
+      {
+        return BlackJackBonusType.Flush;
+      }
+
+      return BlackJackBonusType.No_Bonus;
+
+
+    }
+    
     private void DetermineWinner()
     {
       bool dealerHasBJ = gameForm.DealerScoreLabel.Text == "BJ";
@@ -300,9 +346,15 @@ namespace BlackJack
 
       if (IsInsured)
       {
+        if (UserBalance - insuranceBet < 0)
+        {
+          MessageBox.Show("You don't have enough funds to insure your bet");
+          IsInsured = false;
+        }
         insuranceBet = bet / 2;
         MakeTransfer(-insuranceBet);
         gameForm.BetLabel.Text = (bet+insuranceBet).ToString();
+        gameForm.BalanceLabel.Text = UserBalance.ToString();
       }
     }
     private void MakeTransfer(decimal amount)
@@ -374,25 +426,45 @@ namespace BlackJack
         InitializeCards();
       }
 
+      Card [] bonusCards = new Card[3];
+
       int index = r.Next(0, 312 - counter - 1);
       string card = cards[index];
+      bonusCards[0] = new Card()
+      {
+        CardId = card[0],
+        Suite = card[1]
+      };
       ++playerCardCount;
       SendPlayerScore(card);
       cards.RemoveAt(index);
       sendPlayersCard(card);
       counter++;
+
       card = cards[r.Next(0, 312 - counter - 1)];
       ++dealerCardCount;
       SendDealerScore(card);
       cards.RemoveAt(index);
       sendDealersCard(card);
       counter++;
+      bonusCards[1] = new Card()
+      {
+        CardId = card[0],
+        Suite = card[1]
+      };
+
       card = cards[r.Next(0, 312 - counter - 1)];
       ++playerCardCount;
       SendPlayerScore(card);
       cards.RemoveAt(index);
       sendPlayersCard(card);
       counter++;
+      bonusCards[2] = new Card()
+      {
+        CardId = card[0],
+        Suite = card[1]
+      };
+
       if (gameForm.PlayerScoreLabel.Text != "BJ" && gameForm.DealerScoreLabel.Text == "1/11")
       {
         AskForInsurance();
