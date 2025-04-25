@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,20 +21,20 @@ namespace BlackJack
         private  Game gameForm;
         private int playerScore = 0;
         private int dealerScore = 0;
-        private Random r = new Random();
+        private readonly Random r = new Random();
         private bool playerDecisionMade = false;
         private string playerDecision = "";
         private int playerCardCount = 0;
         private int dealerCardCount = 0;
         private string winner = "Tie";
         private BlackJackContext context;
-        private bool playerHasAce = false;
-        private bool dealerHasAce = false;
-        private bool playerScoresDeducted = false;
-        private bool dealerScoresDeducted = false;
+        private int playerAceCount = 0;
+        private int dealerAceCount = 0;
         private decimal bet;
         private bool playerWinsWithBlackJack = false;
         private int userId;
+        private static bool needsShuffle = false;
+        private static int cuttingCardPosition = 0;
         static BlackJackGame()
         {
             cards = new List<string>();
@@ -65,6 +66,8 @@ namespace BlackJack
                 }
             }
             counter = 0;
+            Random r = new Random();
+            cuttingCardPosition = r.Next(90, 150);
         }
         private void InitializeButtons()
         {
@@ -192,6 +195,11 @@ namespace BlackJack
             {
                 winner = "Dealer";
             }
+
+            if (cards.Count <= cuttingCardPosition)
+            {
+              needsShuffle = true;
+            }
         }
         private void Pay()
         {
@@ -245,33 +253,40 @@ namespace BlackJack
             context.GameHistories.Add(gameHistory);
             context.SaveChanges();
         }
+
         private void DealCards()
         {
-            int index = r.Next(0, 312 - counter);
-            string card = cards[index];
-            ++playerCardCount;
-            SendPlayerScore(card);
-            cards.RemoveAt(index);
-            sendPlayersCard(card);
-            counter++;
-            card = cards[r.Next(0, 312 - counter)];
-            ++dealerCardCount;
-            SendDealerScore(card);
-            cards.RemoveAt(index);
-            sendDealersCard(card);
-            counter++;
-            card = cards[r.Next(0, 312 - counter)];
-            ++playerCardCount;
-            SendPlayerScore(card);
-            cards.RemoveAt(index);
-            sendPlayersCard(card);
-            counter++;
+          if (needsShuffle)
+          {
+            InitializeCards();
+          }
+
+          int index = r.Next(0, 312 - counter);
+          string card = cards[index];
+          ++playerCardCount;
+          SendPlayerScore(card);
+          cards.RemoveAt(index);
+          sendPlayersCard(card);
+          counter++;
+          card = cards[r.Next(0, 312 - counter)];
+          ++dealerCardCount;
+          SendDealerScore(card);
+          cards.RemoveAt(index);
+          sendDealersCard(card);
+          counter++;
+          card = cards[r.Next(0, 312 - counter)];
+          ++playerCardCount;
+          SendPlayerScore(card);
+          cards.RemoveAt(index);
+          sendPlayersCard(card);
+          counter++;
         }
+
         private void sendPlayersCard(string card)
         {
             PictureBox pictureBox = new PictureBox();
 
-            pictureBox.Location = new Point(400+(60*playerCardCount), 400);
+            pictureBox.Location = new Point(400+(60*playerCardCount), 510);
             pictureBox.Size = new Size(60, 120);
             string currentDirectory = Directory.GetCurrentDirectory();
             string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
@@ -313,17 +328,17 @@ namespace BlackJack
             }
             else if (c == 'a')
             {
-                playerHasAce = true;
+                playerAceCount++;
                 playerScore += 11;
             }
             else
             {
                 playerScore += int.Parse(c.ToString());
             }
-            if (playerScore > 21 && playerHasAce && !playerScoresDeducted)
+            if (playerScore > 21 && playerAceCount>0)
             {
                 playerScore -= 10;
-                playerScoresDeducted = true;
+                playerAceCount --;
             }
             if (playerScore == 21 && playerCardCount ==2)
             {
@@ -348,17 +363,17 @@ namespace BlackJack
             }
             else if (c == 'a')
             {
-                dealerHasAce = true;
+                dealerAceCount ++;
                 dealerScore += 11;
             }
             else
             {
                 dealerScore += int.Parse(c.ToString());
             }
-            if (dealerScore > 21 && dealerHasAce && !dealerScoresDeducted)
+            if (dealerScore > 21 && dealerAceCount>0)
             {
                 dealerScore -= 10;
-                dealerScoresDeducted=true;
+                dealerAceCount--;
             }
             if (dealerScore == 21 && dealerCardCount==2)
             {

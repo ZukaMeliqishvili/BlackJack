@@ -26,11 +26,13 @@ namespace BlackJack
 
         public Game(int userId)
         {
-            this.userId = userId;
-            InitializeComponent();
-            context = new BlackJackContext();
-            InitializeButtons();
+          this.FormBorderStyle = FormBorderStyle.FixedDialog;
+          this.userId = userId;
+          InitializeComponent();
+          context = new BlackJackContext();
+          InitializeButtons();
         }
+
         private void InitializeButtons()
         {
 
