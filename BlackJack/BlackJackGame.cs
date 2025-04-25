@@ -35,6 +35,9 @@ namespace BlackJack
     private int userId;
     private static bool needsShuffle = false;
     private static int cuttingCardPosition = 0;
+    private bool RequestInsurance = false;
+    private bool IsInsured = false;
+    public decimal insuranceBet = 0;
 
     static BlackJackGame()
     {
@@ -90,6 +93,28 @@ namespace BlackJack
         playerDecision = "Stand";
         playerDecisionMade = true;
       };
+
+      gameForm.DoubleClicked += (sender, e) =>
+      {
+        playerDecision = "Double";
+        playerDecisionMade = true;
+      };
+
+      gameForm.InsuranceYesClicked += (sender, e) =>
+      {
+        IsInsured = true;
+        RequestInsurance = false;
+        playerDecisionMade = true;
+        gameForm.InsuranceYesButton.Visible=false;
+        gameForm.InsuranceNoButton.Visible=false;
+      };
+
+      gameForm.InsuranceNoClicked += (sender, e) =>
+      {
+        RequestInsurance = false;
+        gameForm.InsuranceYesButton.Visible = false;
+        gameForm.InsuranceNoButton.Visible = false;
+      };
     }
 
     public void StartGame()
@@ -110,12 +135,49 @@ namespace BlackJack
       }
     }
 
+    private void DecisionMade(string decision)
+    {
+      int index = r.Next(0, 312 - counter);
+      string card = cards[index];
+      switch (decision)
+      {
+        case "Hit":
+
+          gameForm.HitButton.Visible = false;
+          gameForm.StandButton.Visible = false;
+          gameForm.DoubleButton.Visible= false;
+          Thread.Sleep(TimeSpan.FromSeconds(1));
+          ++playerCardCount;
+          SendPlayerScore(card);
+          cards.RemoveAt(index);
+          sendPlayersCard(card);
+          counter++;
+          break;
+        case "Double":
+          gameForm.HitButton.Visible = false;
+          gameForm.StandButton.Visible = false;
+          gameForm.DoubleButton.Visible = false;
+          Thread.Sleep(TimeSpan.FromSeconds(1));
+          ++playerCardCount;
+          SendPlayerScore(card);
+          cards.RemoveAt(index);
+          sendPlayersCard(card);
+          counter++;
+          break;
+      }
+
+    }
+
     public void StartGamingProcess()
     {
       while (playerScore < 21)
       {
         gameForm.HitButton.Visible = true;
         gameForm.StandButton.Visible = true;
+        if (playerCardCount <= 2)
+        {
+          gameForm.DoubleButton.Visible = true;
+        }
 
         while (!playerDecisionMade)
         {
@@ -125,24 +187,22 @@ namespace BlackJack
         playerDecisionMade = false;
         if (playerDecision == "Hit")
         {
-          int index = r.Next(0, 312 - counter);
-          string card = cards[index];
-          gameForm.HitButton.Visible = false;
-          gameForm.StandButton.Visible = false;
-          Thread.Sleep(TimeSpan.FromSeconds(1));
-          ++playerCardCount;
-          SendPlayerScore(card);
-          cards.RemoveAt(index);
-          sendPlayersCard(card);
-          counter++;
-
+          DecisionMade("Hit");
           Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        }
+        else if (playerDecision == "Double")
+        {
+          bet *= 2;
+          gameForm.BetLabel.Text = bet.ToString();
+          DecisionMade("Double");
+          Thread.Sleep(TimeSpan.FromSeconds(0.5));
+          break;
         }
         else if (playerDecision == "Stand")
         {
           break;
         }
-
+        gameForm.DoubleButton.Visible=false;
         gameForm.HitButton.Visible = false;
         gameForm.StandButton.Visible = false;
       }
@@ -153,6 +213,7 @@ namespace BlackJack
         return;
       }
 
+      gameForm.DoubleButton.Visible = false;
       gameForm.HitButton.Visible = false;
       gameForm.StandButton.Visible = false;
       scanDealerCards();
@@ -191,9 +252,14 @@ namespace BlackJack
         playerWinsWithBlackJack = true;
         return;
       }
-
+      
       if (dealerHasBJ && !playerHasBJ)
       {
+        if (IsInsured)
+        {
+          bet += insuranceBet;
+          return;
+        }
         winner = "Dealer";
         return;
       }
@@ -219,6 +285,22 @@ namespace BlackJack
       }
     }
 
+    private void AskForInsurance()
+    {
+      RequestInsurance = true;
+      gameForm.InsuranceYesButton.Visible = true;
+      gameForm.InsuranceNoButton.Visible = true;
+      while (RequestInsurance)
+      {
+        Application.DoEvents();
+      }
+
+      if (IsInsured)
+      {
+        insuranceBet = bet / 2;
+        gameForm.BetLabel.Text = (bet+insuranceBet).ToString();
+      }
+    }
     private void Pay()
     {
       decimal payout = bet;
@@ -237,10 +319,11 @@ namespace BlackJack
         //gameForm.ShowWinner("Player", payout + bet);
         gameForm.WinLabel.Show();
         context.SaveChanges();
-
       }
       else if (winner == "Dealer")
       {
+        bet += insuranceBet;
+        payout = bet;
         payout *= -1;
         user.Balance += payout;
         gameForm.WinLabel.ForeColor = Color.Red;
@@ -282,25 +365,29 @@ namespace BlackJack
         InitializeCards();
       }
 
-      int index = r.Next(0, 312 - counter);
+      int index = r.Next(0, 312 - counter - 1);
       string card = cards[index];
       ++playerCardCount;
       SendPlayerScore(card);
       cards.RemoveAt(index);
       sendPlayersCard(card);
       counter++;
-      card = cards[r.Next(0, 312 - counter)];
+      card = cards[r.Next(0, 312 - counter - 1)];
       ++dealerCardCount;
       SendDealerScore(card);
       cards.RemoveAt(index);
       sendDealersCard(card);
       counter++;
-      card = cards[r.Next(0, 312 - counter)];
+      card = cards[r.Next(0, 312 - counter - 1)];
       ++playerCardCount;
       SendPlayerScore(card);
       cards.RemoveAt(index);
       sendPlayersCard(card);
       counter++;
+      if (gameForm.PlayerScoreLabel.Text != "BJ" && gameForm.DealerScoreLabel.Text == "1/11")
+      {
+        AskForInsurance();
+      }
     }
 
     private void sendPlayersCard(string card)

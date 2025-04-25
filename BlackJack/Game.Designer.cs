@@ -41,6 +41,8 @@
       PlayerScoreLabel = new Label();
       WinLabel = new Label();
       button1 = new Button();
+      label2 = new Label();
+      BetLabel = new Label();
       ((System.ComponentModel.ISupportInitialize)BetTextBox).BeginInit();
       SuspendLayout();
       // 
@@ -195,12 +197,34 @@
       button1.UseVisualStyleBackColor = false;
       button1.Click += button1_Click;
       // 
+      // label2
+      // 
+      label2.AutoSize = true;
+      label2.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
+      label2.Location = new Point(1, 485);
+      label2.Name = "label2";
+      label2.Size = new Size(72, 19);
+      label2.TabIndex = 14;
+      label2.Text = "Total Bet:";
+      // 
+      // BetLabel
+      // 
+      BetLabel.AutoSize = true;
+      BetLabel.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
+      BetLabel.ForeColor = Color.Green;
+      BetLabel.Location = new Point(73, 485);
+      BetLabel.Name = "BetLabel";
+      BetLabel.Size = new Size(0, 19);
+      BetLabel.TabIndex = 15;
+      // 
       // Game
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.LightSteelBlue;
       ClientSize = new Size(1130, 648);
+      Controls.Add(BetLabel);
+      Controls.Add(label2);
       Controls.Add(button1);
       Controls.Add(WinLabel);
       Controls.Add(PlayerScoreLabel);
@@ -237,5 +261,7 @@
         public Label PlayerScoreLabel;
         public Label WinLabel;
         private Button button1;
-    }
+    private Label label2;
+    public Label BetLabel;
+  }
 }
