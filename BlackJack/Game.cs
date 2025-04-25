@@ -106,7 +106,7 @@ namespace BlackJack
     {
       user = context.Users.FirstOrDefault(u => u.Id == userId);
       BalanceLabel.Text = String.Format("{0:N2}", user.Balance);
-      UserNameLabel.Text = user.UserName;
+      MainBetLabel.Text = user.UserName;
       PlayerScoreLabel.Text = "";
       DealerScoreLabel.Text = "";
       WinLabel.Hide();
@@ -149,7 +149,9 @@ namespace BlackJack
     private void BetButton_Click(object sender, EventArgs e)
     {
       decimal bet = BetTextBox.Value;
+      decimal bonusBet = BonusBetUpAndDown.Value;
       DepositButton.Hide();
+
       if (bet > decimal.Parse(BalanceLabel.Text))
       {
         MessageBox.Show("You dont have enough funds");
@@ -158,7 +160,8 @@ namespace BlackJack
       }
       
       BetLabel.Text = bet.ToString();
-      BlackJackGame game = new BlackJackGame(this, userId, bet,user.Balance.GetValueOrDefault());
+      SideBetAmountLabel.Text = bonusBet.ToString();
+      BlackJackGame game = new BlackJackGame(this, userId, bet,bonusBet,user.Balance.GetValueOrDefault());
       game.StartGame();
       ReloadGameForm();
     }

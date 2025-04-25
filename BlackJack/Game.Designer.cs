@@ -28,8 +28,9 @@
     /// </summary>
     private void InitializeComponent()
     {
+      Label SideBetLabel;
       LogOutButton = new Button();
-      UserNameLabel = new Label();
+      MainBetLabel = new Label();
       label1 = new Label();
       BalanceLabel = new Label();
       DepositButton = new Button();
@@ -43,8 +44,23 @@
       button1 = new Button();
       label2 = new Label();
       BetLabel = new Label();
+      BonusBetUpAndDown = new NumericUpDown();
+      label3 = new Label();
+      SideBetAmountLabel = new Label();
+      SideBetLabel = new Label();
       ((System.ComponentModel.ISupportInitialize)BetTextBox).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)BonusBetUpAndDown).BeginInit();
       SuspendLayout();
+      // 
+      // SideBetLabel
+      // 
+      SideBetLabel.AutoSize = true;
+      SideBetLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+      SideBetLabel.Location = new Point(396, 485);
+      SideBetLabel.Name = "SideBetLabel";
+      SideBetLabel.Size = new Size(72, 21);
+      SideBetLabel.TabIndex = 16;
+      SideBetLabel.Text = "Side Bet";
       // 
       // LogOutButton
       // 
@@ -61,15 +77,15 @@
       LogOutButton.UseVisualStyleBackColor = false;
       LogOutButton.Click += LogOutButton_Click;
       // 
-      // UserNameLabel
+      // MainBetLabel
       // 
-      UserNameLabel.AutoSize = true;
-      UserNameLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-      UserNameLabel.Location = new Point(6, 418);
-      UserNameLabel.Name = "UserNameLabel";
-      UserNameLabel.Size = new Size(57, 21);
-      UserNameLabel.TabIndex = 2;
-      UserNameLabel.Text = "label1";
+      MainBetLabel.AutoSize = true;
+      MainBetLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+      MainBetLabel.Location = new Point(396, 456);
+      MainBetLabel.Name = "MainBetLabel";
+      MainBetLabel.Size = new Size(78, 21);
+      MainBetLabel.TabIndex = 2;
+      MainBetLabel.Text = "Main Bet";
       // 
       // label1
       // 
@@ -111,7 +127,7 @@
       // 
       BetButton.BackColor = Color.Green;
       BetButton.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
-      BetButton.Location = new Point(480, 478);
+      BetButton.Location = new Point(480, 518);
       BetButton.Margin = new Padding(3, 2, 3, 2);
       BetButton.Name = "BetButton";
       BetButton.Size = new Size(131, 26);
@@ -146,7 +162,7 @@
       // 
       PlayerLabel.AutoSize = true;
       PlayerLabel.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point);
-      PlayerLabel.Location = new Point(438, 412);
+      PlayerLabel.Location = new Point(440, 407);
       PlayerLabel.Name = "PlayerLabel";
       PlayerLabel.Size = new Size(154, 30);
       PlayerLabel.TabIndex = 9;
@@ -168,7 +184,7 @@
       PlayerScoreLabel.AutoSize = true;
       PlayerScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       PlayerScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
-      PlayerScoreLabel.Location = new Point(612, 420);
+      PlayerScoreLabel.Location = new Point(600, 414);
       PlayerScoreLabel.Name = "PlayerScoreLabel";
       PlayerScoreLabel.Size = new Size(57, 21);
       PlayerScoreLabel.TabIndex = 11;
@@ -205,7 +221,7 @@
       label2.Name = "label2";
       label2.Size = new Size(72, 19);
       label2.TabIndex = 14;
-      label2.Text = "Total Bet:";
+      label2.Text = "Main Bet:";
       // 
       // BetLabel
       // 
@@ -217,12 +233,48 @@
       BetLabel.Size = new Size(0, 19);
       BetLabel.TabIndex = 15;
       // 
+      // BonusBetUpAndDown
+      // 
+      BonusBetUpAndDown.DecimalPlaces = 2;
+      BonusBetUpAndDown.Location = new Point(480, 486);
+      BonusBetUpAndDown.Margin = new Padding(3, 2, 3, 2);
+      BonusBetUpAndDown.Maximum = new decimal(new int[] { 500, 0, 0, 0 });
+      BonusBetUpAndDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+      BonusBetUpAndDown.Name = "BonusBetUpAndDown";
+      BonusBetUpAndDown.Size = new Size(131, 23);
+      BonusBetUpAndDown.TabIndex = 17;
+      BonusBetUpAndDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+      // 
+      // label3
+      // 
+      label3.AutoSize = true;
+      label3.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
+      label3.Location = new Point(1, 518);
+      label3.Name = "label3";
+      label3.Size = new Size(68, 19);
+      label3.TabIndex = 18;
+      label3.Text = "Side Bet:";
+      // 
+      // SideBetAmountLabel
+      // 
+      SideBetAmountLabel.AutoSize = true;
+      SideBetAmountLabel.Font = new Font("Segoe UI", 10.2F, FontStyle.Bold, GraphicsUnit.Point);
+      SideBetAmountLabel.ForeColor = Color.Green;
+      SideBetAmountLabel.Location = new Point(73, 518);
+      SideBetAmountLabel.Name = "SideBetAmountLabel";
+      SideBetAmountLabel.Size = new Size(0, 19);
+      SideBetAmountLabel.TabIndex = 19;
+      // 
       // Game
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.LightSteelBlue;
       ClientSize = new Size(1130, 648);
+      Controls.Add(SideBetAmountLabel);
+      Controls.Add(label3);
+      Controls.Add(BonusBetUpAndDown);
+      Controls.Add(SideBetLabel);
       Controls.Add(BetLabel);
       Controls.Add(label2);
       Controls.Add(button1);
@@ -236,20 +288,21 @@
       Controls.Add(DepositButton);
       Controls.Add(BalanceLabel);
       Controls.Add(label1);
-      Controls.Add(UserNameLabel);
+      Controls.Add(MainBetLabel);
       Controls.Add(LogOutButton);
       Margin = new Padding(3, 2, 3, 2);
       Name = "Game";
       Text = "Game";
       Load += Game_Load;
       ((System.ComponentModel.ISupportInitialize)BetTextBox).EndInit();
+      ((System.ComponentModel.ISupportInitialize)BonusBetUpAndDown).EndInit();
       ResumeLayout(false);
       PerformLayout();
     }
 
     #endregion
     private Button LogOutButton;
-        private Label UserNameLabel;
+        private Label MainBetLabel;
         private Label label1;
         public Label BalanceLabel;
         private Button DepositButton;
@@ -263,5 +316,8 @@
         private Button button1;
     private Label label2;
     public Label BetLabel;
+    private NumericUpDown BonusBetUpAndDown;
+    private Label label3;
+    public Label SideBetAmountLabel;
   }
 }

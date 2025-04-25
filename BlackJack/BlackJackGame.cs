@@ -39,14 +39,14 @@ namespace BlackJack
     private bool IsInsured = false;
     public decimal insuranceBet = 0;
     private decimal UserBalance = 0;
-
+    public decimal BonusBet = 0;
     static BlackJackGame()
     {
       cards = new List<string>();
       InitializeCards();
     }
 
-    public BlackJackGame(Game form, int userId, decimal bet, decimal userBalance)
+    public BlackJackGame(Game form, int userId, decimal bet,decimal bonusBet, decimal userBalance)
     {
       this.bet = bet;
       gameForm = form;
@@ -54,7 +54,9 @@ namespace BlackJack
       UserBalance = userBalance;
       InitializeButtons();
       context = new BlackJackContext();
+      this.BonusBet = bonusBet;
       MakeTransfer(-bet);
+      MakeTransfer(-bonusBet);
     }
 
     private static void InitializeCards()
@@ -254,6 +256,17 @@ namespace BlackJack
     private void checkForBonus(Card[] cards)
     {
       BlackJackBonusType bonus = DetermineBonusCombination(cards);
+      if (bonus == BlackJackBonusType.No_Bonus)
+      {
+        return;
+      }
+      int mult = (int)bonus;
+      string WinningCombination = bonus.ToString().Replace('_', ' ');
+      MakeTransfer(BonusBet*mult);
+      gameForm.WinLabel.Text = $"Congratulation you win {(mult * BonusBet)} by {WinningCombination}";
+      gameForm.WinLabel.Visible = true;
+      Thread.Sleep(TimeSpan.FromSeconds(2));
+      gameForm.WinLabel.Visible = false;
     }
 
     private BlackJackBonusType DetermineBonusCombination(Card [] cards)
@@ -469,6 +482,12 @@ namespace BlackJack
       {
         AskForInsurance();
       }
+
+      if (BonusBet > 0)
+      {
+        checkForBonus(bonusCards);
+      }
+      
     }
 
     private void sendPlayersCard(string card)
