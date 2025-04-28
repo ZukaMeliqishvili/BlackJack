@@ -47,6 +47,7 @@
       BonusBetUpAndDown = new NumericUpDown();
       label3 = new Label();
       SideBetAmountLabel = new Label();
+      SideBetWinLabel = new Label();
       SideBetLabel = new Label();
       ((System.ComponentModel.ISupportInitialize)BetTextBox).BeginInit();
       ((System.ComponentModel.ISupportInitialize)BonusBetUpAndDown).BeginInit();
@@ -265,12 +266,24 @@
       SideBetAmountLabel.Size = new Size(0, 19);
       SideBetAmountLabel.TabIndex = 19;
       // 
+      // SideBetWinLabel
+      // 
+      SideBetWinLabel.AutoSize = true;
+      SideBetWinLabel.Font = new Font("Segoe UI", 12.2F, FontStyle.Bold, GraphicsUnit.Point);
+      SideBetWinLabel.ForeColor = Color.Lime;
+      SideBetWinLabel.Location = new Point(28, 69);
+      SideBetWinLabel.Name = "SideBetWinLabel";
+      SideBetWinLabel.Size = new Size(116, 23);
+      SideBetWinLabel.TabIndex = 20;
+      SideBetWinLabel.Text = "SIde bet win ";
+      // 
       // Game
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.LightSteelBlue;
-      ClientSize = new Size(1130, 648);
+      ClientSize = new Size(1130, 733);
+      Controls.Add(SideBetWinLabel);
       Controls.Add(SideBetAmountLabel);
       Controls.Add(label3);
       Controls.Add(BonusBetUpAndDown);
@@ -319,5 +332,6 @@
     private NumericUpDown BonusBetUpAndDown;
     private Label label3;
     public Label SideBetAmountLabel;
+    public Label SideBetWinLabel;
   }
 }

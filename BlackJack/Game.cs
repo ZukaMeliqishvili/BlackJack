@@ -37,6 +37,7 @@ namespace BlackJack
       InitializeComponent();
       context = new BlackJackContext();
       InitializeButtons();
+      this.SideBetWinLabel.Visible=false;
     }
 
     private void InitializeButtons()

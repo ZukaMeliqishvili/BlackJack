@@ -126,11 +126,11 @@ namespace BlackJack
     {
       gameForm.BetButton.Hide();
       gameForm.WinLabel.Hide();
-      decimal amount = decimal.Parse(gameForm.BalanceLabel.Text);
+      gameForm.SideBetWinLabel.Hide();
       gameForm.RemoveImages();
       gameForm.PlayerScoreLabel.Text = "";
       gameForm.DealerScoreLabel.Text = "";
-      gameForm.BalanceLabel.Text = (amount - bet).ToString();
+      gameForm.BalanceLabel.Text = UserBalance.ToString();
       DealCards();
       StartGamingProcess();
       Pay();
@@ -263,10 +263,9 @@ namespace BlackJack
       int mult = (int)bonus;
       string WinningCombination = bonus.ToString().Replace('_', ' ');
       MakeTransfer(BonusBet*mult);
-      gameForm.WinLabel.Text = $"Congratulation you win {(mult * BonusBet)} by {WinningCombination}";
-      gameForm.WinLabel.Visible = true;
-      Thread.Sleep(TimeSpan.FromSeconds(2));
-      gameForm.WinLabel.Visible = false;
+      gameForm.SideBetWinLabel.Text = $"Congratulation \nyou win {(mult * BonusBet)} \nby {WinningCombination}";
+      gameForm.SideBetWinLabel.Visible = true;
+      gameForm.BalanceLabel.Text = UserBalance.ToString();
     }
 
     private BlackJackBonusType DetermineBonusCombination(Card [] cards)
@@ -301,7 +300,6 @@ namespace BlackJack
       }
 
       return BlackJackBonusType.No_Bonus;
-
 
     }
     
@@ -494,7 +492,7 @@ namespace BlackJack
     {
       PictureBox pictureBox = new PictureBox();
 
-      pictureBox.Location = new Point(400 + (60 * playerCardCount), 510);
+      pictureBox.Location = new Point(400 + (60 * playerCardCount), 570);
       pictureBox.Size = new Size(60, 120);
       string currentDirectory = Directory.GetCurrentDirectory();
       string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
