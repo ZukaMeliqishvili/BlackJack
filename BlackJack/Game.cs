@@ -18,6 +18,7 @@ namespace BlackJack
     public event EventHandler HitClicked;
     public event EventHandler StandClicked;
     public event EventHandler DoubleClicked;
+    public event EventHandler SplitClicked;
     public event EventHandler InsuranceYesClicked;
     public event EventHandler InsuranceNoClicked;
     private Deposit_Form depositForm;
@@ -27,6 +28,7 @@ namespace BlackJack
     public Button HitButton { get; private set; }
     public Button StandButton { get; private set; }
     public Button DoubleButton { get; private set; }
+    public Button SplitButton { get; private set; }
     public Button InsuranceYesButton { get; private set; }
     public Button InsuranceNoButton { get; private set; }
 
@@ -38,6 +40,8 @@ namespace BlackJack
       context = new BlackJackContext();
       InitializeButtons();
       this.SideBetWinLabel.Visible=false;
+      Player1ScoreLabel.Visible = false;
+      Player2ScoreLabel.Visible = false;
     }
 
     private void InitializeButtons()
@@ -73,6 +77,16 @@ namespace BlackJack
       DoubleButton.Location = new Point(550, 250);
       Controls.Add(DoubleButton);
 
+      SplitButton = new Button();
+      SplitButton.Text = "Split";
+      SplitButton.Click += (sender, e) => SplitClicked?.Invoke(this, EventArgs.Empty);
+      SplitButton.Visible = false;
+      SplitButton.BackColor = Color.SandyBrown;
+      SplitButton.ForeColor = Color.Black;
+      SplitButton.Size = new Size(100, 40);
+      SplitButton.Location = new Point(650, 250);
+      Controls.Add(SplitButton);
+
       InsuranceYesButton = new Button();
       InsuranceYesButton.Text = "Insure bet";
       InsuranceYesButton.Click += (sender, e) => InsuranceYesClicked?.Invoke(this, EventArgs.Empty);
@@ -92,7 +106,6 @@ namespace BlackJack
       InsuranceNoButton.Size = new Size(100, 40);
       InsuranceNoButton.Location = new Point(500, 350);
       Controls.Add(InsuranceNoButton);
-
     }
 
     private void LogOutButton_Click(object sender, EventArgs e)

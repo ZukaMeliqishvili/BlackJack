@@ -58,24 +58,10 @@ namespace BlackJack
     {
       var cardList = cards.ToList();
       cardList.Sort();
-      Dictionary<char, int> cardOrder = new Dictionary<char, int>()
-      {
-        { '2', 2 },
-        { '3', 3 },
-        { '4', 4 },
-        { '5', 5 },
-        { '6', 6 },
-        { '7', 7 },
-        { '8', 8 },
-        { '9', 9 },
-        { 't', 10 },
-        { 'j', 11 },
-        { 'q', 12 },
-        { 'k', 13 },
-        { 'a', 14 }
-      };
+      Dictionary<char, int> cardOrder = Card.CardOrder;
+
       bool isSequential = true;
-      for (int i =0; i<cardList.Count-1;++i)
+      for (int i = 0; i < cardList.Count - 1; ++i)
       {
         if ((cardOrder[cardList[i].CardId] + 1) != cardOrder[cardList[i + 1].CardId])
         {
@@ -95,6 +81,7 @@ namespace BlackJack
           return true;
         }
       }
+
       return false;
     }
   }
