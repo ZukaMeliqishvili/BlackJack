@@ -39,7 +39,7 @@ namespace BlackJack
       InitializeComponent();
       context = new BlackJackContext();
       InitializeButtons();
-      this.SideBetWinLabel.Visible=false;
+      this.SideBetWinLabel.Visible = false;
       Player1ScoreLabel.Visible = false;
       Player2ScoreLabel.Visible = false;
     }
@@ -172,10 +172,10 @@ namespace BlackJack
         DepositButton.Show();
         return;
       }
-      
+
       BetLabel.Text = bet.ToString();
       SideBetAmountLabel.Text = bonusBet.ToString();
-      BlackJackGame game = new BlackJackGame(this, userId, bet,bonusBet,user.Balance.GetValueOrDefault());
+      BlackJackGame game = new BlackJackGame(this, userId, bet, bonusBet, user.Balance.GetValueOrDefault());
       game.StartGame();
       ReloadGameForm();
     }
@@ -204,6 +204,11 @@ namespace BlackJack
     {
       GameHistoryForm form = new GameHistoryForm(userId);
       form.Show();
+    }
+
+    private void PlayerScoreLabel_Click(object sender, EventArgs e)
+    {
+
     }
 
     //public void ShowWinner(string winner, decimal amount)

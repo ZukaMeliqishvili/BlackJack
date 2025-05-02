@@ -11,7 +11,6 @@ namespace BlackJack
     public int Id { get; set; }
     public int PlayerScore { get; set; }
     public bool PlayerHasBJ { get; set; }
-    public int CardCount { get; set; }
     public List<Card> Cards { get; set; } = new List<Card>();
     public decimal Bet;
     public int AceCount { get; set; }

@@ -38,6 +38,7 @@ namespace BlackJack
     private decimal UserBalance = 0;
     public decimal BonusBet = 0;
     private bool IsSplited = false;
+    private int HighlightedLabel = 0;
     private List<PictureBox> CardPictures = new List<PictureBox>();
 
     static BlackJackGame()
@@ -186,11 +187,12 @@ namespace BlackJack
     {
       for (int i = 0; i<Players.Count; i++)
       {
+        CheckForHiglight(i);
         while (Players[i].PlayerScore < 21)
         {
           gameForm.HitButton.Visible = true;
           gameForm.StandButton.Visible = true;
-          if (Players[i].CardCount <= 2)
+          if (Players[i].Cards.Count <= 2)
           {
             gameForm.DoubleButton.Visible = true;
           }
@@ -221,9 +223,9 @@ namespace BlackJack
 
             MakeTransfer(-Players[i].Bet);
             Players[i].Bet *= 2;
-            gameForm.BetLabel.Text = Players[i].Bet.ToString();
             gameForm.BalanceLabel.Text = UserBalance.ToString();
             DecisionMade("Double", Players[i].Id);
+            UpdateBetLabel();
             Thread.Sleep(TimeSpan.FromSeconds(0.5));
             break;
           }
@@ -237,10 +239,11 @@ namespace BlackJack
 
             gameForm.PlayerScoreLabel.Visible = false;
             MakeTransfer(-Players[i].Bet);
-            gameForm.BetLabel.Text = Players[i].Bet.ToString();
             gameForm.BalanceLabel.Text = UserBalance.ToString();
             gameForm.SplitButton.Visible = false;
             IsSplited = true;
+            Players[i].Bet *= 2;
+            UpdateBetLabel();
             MakeSplit();
             return;
           }
@@ -408,7 +411,7 @@ namespace BlackJack
 
         insuranceBet = player.Bet / 2;
         MakeTransfer(-insuranceBet);
-        gameForm.BetLabel.Text = (player.Bet + insuranceBet).ToString();
+        UpdateBetLabel();
         gameForm.BalanceLabel.Text = UserBalance.ToString();
       }
     }
@@ -447,7 +450,7 @@ namespace BlackJack
         else
         {
           //If bet is insured loop will perform only once
-          if (IsInsured && gameForm.DealerScoreLabel.Text == "BJ")
+          if (IsInsured && gameForm.DealerScoreLabel.Text == "BJ" && player.PlayerScore <=21)
           {
             MakeTransfer(player.Bet + insuranceBet);
           }
@@ -522,8 +525,8 @@ namespace BlackJack
 
       card = GetCard();
       ++dealerCardCount;
-      SendDealerScore(card);
       sendDealersCard(card);
+      SendDealerScore(card);
       bonusCards[1] = new Card()
       {
         CardId = card[0],
@@ -531,9 +534,9 @@ namespace BlackJack
       };
 
       card = GetCard();
-
-      SendPlayerScore(card, player.Id);
       sendPlayersCard(card, 1);
+      SendPlayerScore(card, player.Id);
+      
       bonusCards[2] = new Card()
       {
         CardId = card[0],
@@ -561,20 +564,19 @@ namespace BlackJack
         CardId = card[0],
         Suite = card[1]
       });
-      player.CardCount++;
       if (!IsSplited)
       {
-        pictureBox.Location = new Point(400 + (60 * player.CardCount), 570);
+        pictureBox.Location = new Point(400 + (60 * player.Cards.Count), 570);
       }
       else
       {
         if (player.Id == 1)
         {
-          pictureBox.Location = new Point(200 + (60 * player.CardCount), 570);
+          pictureBox.Location = new Point(200 + (60 * player.Cards.Count), 570);
         }
         else
         {
-          pictureBox.Location = new Point(600 + (60 * player.CardCount), 570);
+          pictureBox.Location = new Point(600 + (60 * player.Cards.Count), 570);
         }
       }
 
@@ -636,7 +638,7 @@ namespace BlackJack
         player.AceCount--;
       }
 
-      if (player.PlayerScore == 21 && player.CardCount == 2 && !IsSplited)
+      if (player.PlayerScore == 21 && player.Cards.Count == 2 && !IsSplited)
       {
         //gameForm.PlayerScoreLabel.Text = "BJ";
         gameForm.Invoke(() => gameForm.PlayerScoreLabel.Text = "BJ");
@@ -740,16 +742,15 @@ namespace BlackJack
     private void MakeSplit()
     {
       Player player1 = Players.First();
+      player1.Bet /= 2;
       Player player2 = new Player()
       {
         Id = 2,
-        Bet = player1.Bet,
+        Bet = player1.Bet/2,
         AceCount = player1.AceCount / 2,
-        CardCount = 1,
         PlayerScore = 0,
       };
 
-      player1.CardCount = 1;
       player1.AceCount = 0;
       player1.PlayerScore = 0;
       Players.Add(player2);
@@ -795,6 +796,27 @@ namespace BlackJack
         sendPlayersCard(tempCards[i].ToString(), Players[i].Id);
       }
 
+    }
+    private void UpdateBetLabel()
+    {
+      gameForm.BetLabel.Text = (Players.Sum(x => x.Bet) + insuranceBet).ToString();
+    }
+
+    private void CheckForHiglight(int playerId)
+    {
+      if (IsSplited)
+      {
+        if (playerId == 0 && HighlightedLabel!=1)
+        {
+          gameForm.Player1ScoreLabel.ForeColor = Color.Yellow;
+          gameForm.Player2ScoreLabel.ForeColor = Color.Green;
+        }
+        else if (playerId == 1 && HighlightedLabel != 2)
+        {
+          gameForm.Player2ScoreLabel.ForeColor = Color.Yellow;
+          gameForm.Player1ScoreLabel.ForeColor = Color.Green;
+        }
+      }
     }
   }
 }

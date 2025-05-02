@@ -176,11 +176,12 @@
       PlayerScoreLabel.AutoSize = true;
       PlayerScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       PlayerScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
-      PlayerScoreLabel.Location = new Point(494, 414);
+      PlayerScoreLabel.Location = new Point(507, 706);
       PlayerScoreLabel.Name = "PlayerScoreLabel";
       PlayerScoreLabel.Size = new Size(57, 21);
       PlayerScoreLabel.TabIndex = 11;
       PlayerScoreLabel.Text = "label4";
+      PlayerScoreLabel.Click += PlayerScoreLabel_Click;
       // 
       // WinLabel
       // 
@@ -271,7 +272,7 @@
       Player1ScoreLabel.AutoSize = true;
       Player1ScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       Player1ScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
-      Player1ScoreLabel.Location = new Point(342, 414);
+      Player1ScoreLabel.Location = new Point(318, 706);
       Player1ScoreLabel.Name = "Player1ScoreLabel";
       Player1ScoreLabel.Size = new Size(109, 21);
       Player1ScoreLabel.TabIndex = 21;
@@ -282,7 +283,7 @@
       Player2ScoreLabel.AutoSize = true;
       Player2ScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       Player2ScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
-      Player2ScoreLabel.Location = new Point(640, 414);
+      Player2ScoreLabel.Location = new Point(672, 706);
       Player2ScoreLabel.Name = "Player2ScoreLabel";
       Player2ScoreLabel.Size = new Size(109, 21);
       Player2ScoreLabel.TabIndex = 22;
@@ -293,7 +294,7 @@
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.LightSteelBlue;
-      ClientSize = new Size(1130, 733);
+      ClientSize = new Size(1130, 736);
       Controls.Add(Player2ScoreLabel);
       Controls.Add(Player1ScoreLabel);
       Controls.Add(SideBetWinLabel);
