@@ -37,7 +37,6 @@
       BetButton = new Button();
       BetTextBox = new NumericUpDown();
       DealerLabel = new Label();
-      PlayerLabel = new Label();
       DealerScoreLabel = new Label();
       PlayerScoreLabel = new Label();
       WinLabel = new Label();
@@ -48,6 +47,8 @@
       label3 = new Label();
       SideBetAmountLabel = new Label();
       SideBetWinLabel = new Label();
+      Player1ScoreLabel = new Label();
+      Player2ScoreLabel = new Label();
       SideBetLabel = new Label();
       ((System.ComponentModel.ISupportInitialize)BetTextBox).BeginInit();
       ((System.ComponentModel.ISupportInitialize)BonusBetUpAndDown).BeginInit();
@@ -159,16 +160,6 @@
       DealerLabel.TabIndex = 8;
       DealerLabel.Text = "Dealer's score";
       // 
-      // PlayerLabel
-      // 
-      PlayerLabel.AutoSize = true;
-      PlayerLabel.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point);
-      PlayerLabel.Location = new Point(440, 407);
-      PlayerLabel.Name = "PlayerLabel";
-      PlayerLabel.Size = new Size(154, 30);
-      PlayerLabel.TabIndex = 9;
-      PlayerLabel.Text = "Player's score";
-      // 
       // DealerScoreLabel
       // 
       DealerScoreLabel.AutoSize = true;
@@ -185,11 +176,12 @@
       PlayerScoreLabel.AutoSize = true;
       PlayerScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       PlayerScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
-      PlayerScoreLabel.Location = new Point(600, 414);
+      PlayerScoreLabel.Location = new Point(507, 706);
       PlayerScoreLabel.Name = "PlayerScoreLabel";
       PlayerScoreLabel.Size = new Size(57, 21);
       PlayerScoreLabel.TabIndex = 11;
       PlayerScoreLabel.Text = "label4";
+      PlayerScoreLabel.Click += PlayerScoreLabel_Click;
       // 
       // WinLabel
       // 
@@ -240,11 +232,9 @@
       BonusBetUpAndDown.Location = new Point(480, 486);
       BonusBetUpAndDown.Margin = new Padding(3, 2, 3, 2);
       BonusBetUpAndDown.Maximum = new decimal(new int[] { 500, 0, 0, 0 });
-      BonusBetUpAndDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
       BonusBetUpAndDown.Name = "BonusBetUpAndDown";
       BonusBetUpAndDown.Size = new Size(131, 23);
       BonusBetUpAndDown.TabIndex = 17;
-      BonusBetUpAndDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
       // 
       // label3
       // 
@@ -277,12 +267,36 @@
       SideBetWinLabel.TabIndex = 20;
       SideBetWinLabel.Text = "SIde bet win ";
       // 
+      // Player1ScoreLabel
+      // 
+      Player1ScoreLabel.AutoSize = true;
+      Player1ScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+      Player1ScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
+      Player1ScoreLabel.Location = new Point(318, 706);
+      Player1ScoreLabel.Name = "Player1ScoreLabel";
+      Player1ScoreLabel.Size = new Size(109, 21);
+      Player1ScoreLabel.TabIndex = 21;
+      Player1ScoreLabel.Text = "player1Score";
+      // 
+      // Player2ScoreLabel
+      // 
+      Player2ScoreLabel.AutoSize = true;
+      Player2ScoreLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+      Player2ScoreLabel.ForeColor = Color.FromArgb(0, 192, 0);
+      Player2ScoreLabel.Location = new Point(672, 706);
+      Player2ScoreLabel.Name = "Player2ScoreLabel";
+      Player2ScoreLabel.Size = new Size(109, 21);
+      Player2ScoreLabel.TabIndex = 22;
+      Player2ScoreLabel.Text = "player2Score";
+      // 
       // Game
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       BackColor = Color.LightSteelBlue;
-      ClientSize = new Size(1130, 733);
+      ClientSize = new Size(1130, 736);
+      Controls.Add(Player2ScoreLabel);
+      Controls.Add(Player1ScoreLabel);
       Controls.Add(SideBetWinLabel);
       Controls.Add(SideBetAmountLabel);
       Controls.Add(label3);
@@ -294,7 +308,6 @@
       Controls.Add(WinLabel);
       Controls.Add(PlayerScoreLabel);
       Controls.Add(DealerScoreLabel);
-      Controls.Add(PlayerLabel);
       Controls.Add(DealerLabel);
       Controls.Add(BetTextBox);
       Controls.Add(BetButton);
@@ -322,7 +335,6 @@
         public Button BetButton;
         private NumericUpDown BetTextBox;
         private Label DealerLabel;
-        private Label PlayerLabel;
         public Label DealerScoreLabel;
         public Label PlayerScoreLabel;
         public Label WinLabel;
@@ -333,5 +345,7 @@
     private Label label3;
     public Label SideBetAmountLabel;
     public Label SideBetWinLabel;
+    public Label Player1ScoreLabel;
+    public Label Player2ScoreLabel;
   }
 }
